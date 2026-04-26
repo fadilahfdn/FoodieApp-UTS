@@ -12,9 +12,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Navigation button to MenuListActivity (will work once Anggota 5 adds it)
         binding.btnLihatMenu.setOnClickListener {
-            startActivity(Intent(this,
-                MenuListActivity::class.java))
+            startActivity(Intent(this, MenuListActivity::class.java))
         }
     }
 }
