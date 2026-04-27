@@ -14,6 +14,10 @@ class MenuListActivity : AppCompatActivity() {
         binding = ActivityMenuListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.btnBack.setOnClickListener {
+            finish() // Menutup halaman katalog dan kembali ke halaman sebelumnya (Beranda)
+        }
+
         val menuList = FoodRepository.getMenu()
 
         // Ganti ArrayAdapter dengan FoodAdapter custom
