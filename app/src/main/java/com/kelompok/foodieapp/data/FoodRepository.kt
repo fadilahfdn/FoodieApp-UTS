@@ -46,10 +46,9 @@ object FoodRepository {
                 name = "Es Jeruk Segar",
                 desc = "Minuman jeruk peras segar dingin, cocok menemani makan",
                 price = 8000,
-                originalPrice = 12000,
                 imageRes = R.drawable.menu_es_jeruk,
                 rating = 4.5f,
-                badge = "Diskon"
+                badge = "Rekomendasi"
             ),
             FoodItem(
                 id = 6,
