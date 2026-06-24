@@ -3,13 +3,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg_color"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/bg_color">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Keranjang — Diisi oleh A3"
+        android:text="🛒 Keranjang Belanja"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"/>
+
+    <TextView
+        android:id="@+id/tvCartEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Keranjang masih kosong.\nYuk, pilih menu dulu!"
         android:textSize="16sp"
-        android:textColor="@color/text_muted"/>
+        android:textColor="@color/text_muted"
+        android:gravity="center"
+        android:layout_marginTop="60dp"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/layoutCartContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvCartItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginTop="16dp"/>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="@color/text_muted" android:layout_marginVertical="12dp"/>
+
+        <TextView
+            android:id="@+id/tvCartTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: Rp 0"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/brand_primary"/>
+
+        <Button
+            android:id="@+id/btnCheckout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:text="KONFIRMASI PESANAN"
+            android:backgroundTint="@color/brand_primary"
+            android:textColor="@color/white"/>
+    </LinearLayout>
 </LinearLayout>
