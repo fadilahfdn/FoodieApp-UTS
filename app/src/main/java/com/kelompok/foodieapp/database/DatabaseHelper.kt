@@ -135,6 +135,11 @@ class DatabaseHelper(context: Context) :
         }
     }
 
+    fun updateCartQuantity(cartId: Int, newQuantity: Int) {
+        val cv = ContentValues().apply { put("quantity", newQuantity) }
+        writableDatabase.update("cart", cv, "id=?", arrayOf(cartId.toString()))
+    }
+
     fun getCartItems(): List<Map<String, Any>> {
         val result = mutableListOf<Map<String, Any>>()
         val cursor = readableDatabase.rawQuery("SELECT * FROM cart", null)

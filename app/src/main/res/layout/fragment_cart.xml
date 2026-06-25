@@ -12,7 +12,8 @@
         android:text="🛒 Keranjang Belanja"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="@color/text_primary"/>
+        android:textColor="@color/text_primary"
+        android:layout_marginBottom="12dp"/>
 
     <TextView
         android:id="@+id/tvCartEmpty"
@@ -25,23 +26,25 @@
         android:layout_marginTop="60dp"
         android:visibility="gone"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"/>
+
     <LinearLayout
-        android:id="@+id/layoutCartContent"
+        android:id="@+id/layoutCartFooter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tvCartItems"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="@color/text_primary"
-            android:layout_marginTop="16dp"/>
-
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-            android:background="@color/text_muted" android:layout_marginVertical="12dp"/>
+            android:layout_height="1dp"
+            android:background="@color/text_muted"
+            android:layout_marginVertical="12dp"/>
 
         <TextView
             android:id="@+id/tvCartTotal"
@@ -56,9 +59,11 @@
             android:id="@+id/btnCheckout"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:text="KONFIRMASI PESANAN"
             android:backgroundTint="@color/brand_primary"
             android:textColor="@color/white"/>
+
     </LinearLayout>
+
 </LinearLayout>

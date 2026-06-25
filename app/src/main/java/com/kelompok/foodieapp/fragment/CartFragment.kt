@@ -1,11 +1,11 @@
 package com.kelompok.foodieapp.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.kelompok.foodieapp.adapter.CartAdapter
 import com.kelompok.foodieapp.database.DatabaseHelper
 import com.kelompok.foodieapp.databinding.FragmentCartBinding
 
@@ -13,6 +13,7 @@ class CartFragment : Fragment() {
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: DatabaseHelper
+    private lateinit var adapter: CartAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -24,6 +25,29 @@ class CartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         db = DatabaseHelper(requireContext())
+
+        adapter = CartAdapter(
+            items      = emptyList(),
+            onIncrease = { cartId, currentQty ->
+                db.updateCartQuantity(cartId, currentQty + 1)
+                loadCart()
+            },
+            onDecrease = { cartId, currentQty ->
+                if (currentQty > 1) {
+                    db.updateCartQuantity(cartId, currentQty - 1)
+                } else {
+                    db.removeFromCart(cartId)
+                }
+                loadCart()
+            },
+            onDelete = { cartId ->
+                db.removeFromCart(cartId)
+                loadCart()
+            }
+        )
+
+        binding.rvCart.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvCart.adapter = adapter
 
         loadCart()
 
@@ -39,24 +63,17 @@ class CartFragment : Fragment() {
         val total = db.getCartTotal()
 
         if (items.isEmpty()) {
-            binding.tvCartEmpty.visibility = View.VISIBLE
-            binding.layoutCartContent.visibility = View.GONE
+            binding.tvCartEmpty.visibility   = View.VISIBLE
+            binding.rvCart.visibility        = View.GONE
+            binding.layoutCartFooter.visibility = View.GONE
         } else {
-            binding.tvCartEmpty.visibility = View.GONE
-            binding.layoutCartContent.visibility = View.VISIBLE
-
-            val summary = items.joinToString("\n") { item ->
-                "• ${item["menu_name"]} x${item["quantity"]} — Rp ${
-                    String.format("%,d", (item["menu_price"] as Int) * (item["quantity"] as Int)).replace(',', '.')
-                }"
-            }
-            binding.tvCartItems.text = summary
+            binding.tvCartEmpty.visibility   = View.GONE
+            binding.rvCart.visibility        = View.VISIBLE
+            binding.layoutCartFooter.visibility = View.VISIBLE
+            adapter.updateData(items)
             binding.tvCartTotal.text = "Total: Rp ${String.format("%,d", total).replace(',', '.')}"
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
