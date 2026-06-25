@@ -21,7 +21,7 @@ class RegisterActivity : AppCompatActivity() {
         db = DatabaseHelper(this)
 
         // Tombol Daftar
-        binding.btnRegister.setOnClickListener {
+        binding.btnDaftar.setOnClickListener {
             val name = binding.etName.text.toString().trim()
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
@@ -64,7 +64,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         // Teks untuk pindah ke halaman Login
-        binding.tvLogin.setOnClickListener {
+        binding.tvLoginLink.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
