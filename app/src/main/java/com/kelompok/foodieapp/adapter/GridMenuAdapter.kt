@@ -27,7 +27,7 @@ class GridMenuAdapter(
         val imageUrl = item["image_url"]
         Glide.with(holder.itemView.context)
             .load(imageUrl)
-            .placeholder(R.color.brand_secondary)   // Munculkan warna ini saat gambar sedang loading
+            .placeholder(R.drawable.loading_images)   // Munculkan warna ini saat gambar sedang loading
             .error(R.color.brand_secondary)         // Munculkan warna ini jika gambar gagal dimuat
             .centerCrop()                                       // Agar gambar penuh dan proporsional di dalam kotak
             .into(holder.binding.imgGridMenu)
