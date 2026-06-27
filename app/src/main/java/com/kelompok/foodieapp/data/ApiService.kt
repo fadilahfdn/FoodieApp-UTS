@@ -3,6 +3,7 @@ package com.kelompok.foodieapp.data
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
+import kotlin.math.min // Pastikan ini ter-import jika minOf error
 
 object ApiService {
 
@@ -22,11 +23,21 @@ object ApiService {
             val json     = JSONObject(body)
             val meals    = json.optJSONArray("meals") ?: return result
 
-            for (i in 0 until minOf(meals.length(), 5)) {
+            for (i in 0 until minOf(meals.length(), 16)) {
                 val meal = meals.getJSONObject(i)
+
+                val randomPrices = listOf(20000, 25000, 30000, 35000, 40000, 45000, 50000)
+                val price = randomPrices.random()
+
+                val mockDescription = "Menu rekomendasi spesial hari ini asal ${meal.getString("strCountry")}. Disiapkan dengan bahan pilihan yang pastinya menggugah selera!"
+
                 result.add(mapOf(
+                    "id"        to meal.getString("idMeal"),
                     "name"      to meal.getString("strMeal"),
-                    "image_url" to meal.getString("strMealThumb")
+                    "image_url" to meal.getString("strMealThumb"),
+                    "description" to mockDescription,
+                    "price" to price.toString(),
+                    "category" to selectedCategory
                 ))
             }
             result
@@ -35,5 +46,4 @@ object ApiService {
             result
         }
     }
-
 }

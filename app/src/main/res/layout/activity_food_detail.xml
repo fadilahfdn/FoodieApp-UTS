@@ -32,6 +32,15 @@
             android:textColor="@color/text_primary"
             />
         <TextView
+            android:id="@+id/tvDetailCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kategori"
+            android:textSize="14sp"
+            android:textColor="@color/brand_primary"
+            android:textStyle="italic"
+            />
+        <TextView
             android:id="@+id/tvDetailPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

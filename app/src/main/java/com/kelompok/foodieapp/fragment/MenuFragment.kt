@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.kelompok.foodieapp.R
 import com.kelompok.foodieapp.FoodDetailActivity
 import com.kelompok.foodieapp.adapter.MenuAdapter
 import com.kelompok.foodieapp.data.MenuItem
@@ -38,6 +39,8 @@ class MenuFragment : Fragment() {
                 putExtra("MENU_NAME",  menuItem.name)
                 putExtra("MENU_DESC",  menuItem.description)
                 putExtra("MENU_PRICE", menuItem.price)
+                putExtra("MENU_CATEGORY", menuItem.category)
+                putExtra("MENU_IMAGE", menuItem.imageRes)
             }
             startActivity(intent)
         }
@@ -62,12 +65,18 @@ class MenuFragment : Fragment() {
     private fun loadMenus() {
         val rawMenus = db.getAllMenus()
         allMenus = rawMenus.map {
+            val imageResName = it["image_url"] as? String ?: ""
+            val resId = if (imageResName.isNotEmpty()) {
+                requireContext().resources.getIdentifier(imageResName, "drawable", requireContext().packageName)
+            } else 0
+
             MenuItem(
                 id          = it["id"] as Int,
                 name        = it["name"] as String,
                 description = it["description"] as String,
                 price       = it["price"] as Int,
-                imageUrl    = it["image_url"] as String,
+                category    = it["category"] as String,
+                imageRes    = if (resId != 0) resId else R.drawable.ic_launcher_background,
                 rating      = it["rating"] as Double
             )
         }

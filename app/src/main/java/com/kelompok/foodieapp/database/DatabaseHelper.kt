@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class DatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "foodieapp.db", null, 3) {
+    SQLiteOpenHelper(context, "foodieapp.db", null, 6) { // Upgrade to version 6
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""
@@ -23,6 +23,7 @@ class DatabaseHelper(context: Context) :
                 name TEXT NOT NULL,
                 description TEXT,
                 price INTEGER NOT NULL,
+                category TEXT,
                 image_url TEXT,
                 rating REAL DEFAULT 4.5
             )
@@ -47,19 +48,22 @@ class DatabaseHelper(context: Context) :
     }
 
     private fun insertDefaultMenus(db: SQLiteDatabase) {
+        data class MenuData(val name: String, val desc: String, val price: Int, val category: String, val img: String)
         val menus = listOf(
-            Triple("Nasi Goreng Spesial", "Porsi besar dengan telur dan ayam pilihan", 25000),
-            Triple("Ayam Taliwang", "Ayam bakar khas Lombok dengan bumbu rempah pedas", 32000),
-            Triple("Mie Bakso", "Mie kuah hangat dengan bakso sapi kenyal dan pelengkap", 20000),
-            Triple("Sate Maranggi", "Sate daging sapi khas Purwakarta dengan bumbu kecap manis", 28000),
-            Triple("Es Jeruk Segar", "Minuman jeruk peras segar dingin, cocok menemani makan", 8000),
-            Triple("Es Teh Manis", "Teh manis dingin klasik, menyegarkan dan selalu pas", 6000)
+            MenuData("Nasi Goreng Spesial", "Porsi besar dengan telur dan ayam pilihan", 25000, "Chicken" , "menu_nasgor"),
+            MenuData("Ayam Taliwang", "Ayam bakar khas Lombok dengan bumbu rempah pedas", 32000, "Chicken" , "menu_ayam_taliwang"),
+            MenuData("Mie Bakso", "Mie kuah hangat dengan bakso sapi kenyal dan pelengkap", 20000, "Beef" , "menu_mie_bakso"),
+            MenuData("Sate Maranggi", "Sate daging sapi khas Purwakarta dengan bumbu kecap manis", 28000, "Beef" , "menu_sate_maranggi"),
+            MenuData("Es Jeruk Segar", "Minuman jeruk peras segar dingin, cocok menemani makan", 8000, "Dessert",  "menu_es_jeruk"),
+            MenuData("Es Teh Manis", "Teh manis dingin klasik, menyegarkan dan selalu pas", 6000, "Dessert",  "menu_es_teh")
         )
-        menus.forEach { (name, description, price) ->
+        menus.forEach { menu ->
             val cv = ContentValues().apply {
-                put("name", name)
-                put("description", description)
-                put("price", price)
+                put("name", menu.name)
+                put("description", menu.desc)
+                put("price", menu.price)
+                put("category", menu.category)
+                put("image_url", menu.img)
             }
             db.insert("menus", null, cv)
         }
@@ -94,15 +98,59 @@ class DatabaseHelper(context: Context) :
     fun getAllMenus(): List<Map<String, Any>> {
         val result = mutableListOf<Map<String, Any>>()
         val cursor = readableDatabase.rawQuery("SELECT * FROM menus", null)
+        
+        val idCol = cursor.getColumnIndex("id")
+        val nameCol = cursor.getColumnIndex("name")
+        val descCol = cursor.getColumnIndex("description")
+        val priceCol = cursor.getColumnIndex("price")
+        val catCol = cursor.getColumnIndex("category")
+        val imgCol = cursor.getColumnIndex("image_url")
+        val rateCol = cursor.getColumnIndex("rating")
+
         while (cursor.moveToNext()) {
-            result.add(mapOf(
-                "id"          to cursor.getInt(0),
-                "name"        to cursor.getString(1),
-                "description" to cursor.getString(2),
-                "price"       to cursor.getInt(3),
-                "image_url"   to (cursor.getString(4) ?: ""),
-                "rating"      to cursor.getDouble(5)
-            ))
+            val item = mutableMapOf<String, Any>()
+            if (idCol != -1) item["id"] = cursor.getInt(idCol)
+            if (nameCol != -1) item["name"] = cursor.getString(nameCol)
+            if (descCol != -1) item["description"] = cursor.getString(descCol)
+            if (priceCol != -1) item["price"] = cursor.getInt(priceCol)
+            if (catCol != -1) item["category"] = cursor.getString(catCol) ?: ""
+            if (imgCol != -1) item["image_url"] = cursor.getString(imgCol) ?: ""
+            if (rateCol != -1) item["rating"] = cursor.getDouble(rateCol)
+            result.add(item)
+        }
+        cursor.close()
+        return result
+    }
+
+    fun getMenusByCategory(category: String?): List<Map<String, Any>> {
+        val result = mutableListOf<Map<String, Any>>()
+        val query = if (category == null) {
+            "SELECT * FROM menus"
+        } else {
+            "SELECT * FROM menus WHERE category = ?"
+        }
+        val args = if (category == null) null else arrayOf(category)
+        
+        val cursor = readableDatabase.rawQuery(query, args)
+        
+        val idCol = cursor.getColumnIndex("id")
+        val nameCol = cursor.getColumnIndex("name")
+        val descCol = cursor.getColumnIndex("description")
+        val priceCol = cursor.getColumnIndex("price")
+        val catCol = cursor.getColumnIndex("category")
+        val imgCol = cursor.getColumnIndex("image_url")
+        val rateCol = cursor.getColumnIndex("rating")
+
+        while (cursor.moveToNext()) {
+            val item = mutableMapOf<String, Any>()
+            if (idCol != -1) item["id"] = cursor.getInt(idCol)
+            if (nameCol != -1) item["name"] = cursor.getString(nameCol)
+            if (descCol != -1) item["description"] = cursor.getString(descCol)
+            if (priceCol != -1) item["price"] = cursor.getInt(priceCol)
+            if (catCol != -1) item["category"] = cursor.getString(catCol) ?: ""
+            if (imgCol != -1) item["image_url"] = cursor.getString(imgCol) ?: ""
+            if (rateCol != -1) item["rating"] = cursor.getDouble(rateCol)
+            result.add(item)
         }
         cursor.close()
         return result
