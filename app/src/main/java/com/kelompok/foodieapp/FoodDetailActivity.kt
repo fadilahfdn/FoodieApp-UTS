@@ -1,15 +1,21 @@
 package com.kelompok.foodieapp
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.kelompok.foodieapp.database.DatabaseHelper
 import com.kelompok.foodieapp.databinding.ActivityFoodDetailBinding
 
 class FoodDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFoodDetailBinding
     private lateinit var db: DatabaseHelper
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +68,33 @@ class FoodDetailActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Data menu tidak valid!", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        checkAndCalculateDistance()
+    }
+
+    private fun checkAndCalculateDistance() {
+        // Cek diam-diam, apakah MainActivity tadi sudah berhasil dapat izin?
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+
+            // Izin ada! Langsung ambil koordinat GPS
+            @SuppressWarnings("MissingPermission")
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val userLat = location.latitude
+                    val userLng = location.longitude
+
+                    binding.tvJarak.text = "Menghitung..."
+                    // TODO: Eksekusi tembak OSRM API di sini
+                } else {
+                    binding.tvJarak.text = "Tidak diketahui"
+                }
+            }
+        } else {
+            // Jika user menolak izin di awal, tampilkan teks fallback saja
+            binding.tvJarak.text = "Tidak diketahui"
         }
     }
 }

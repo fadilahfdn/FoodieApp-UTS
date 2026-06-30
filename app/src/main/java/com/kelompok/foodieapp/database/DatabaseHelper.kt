@@ -6,9 +6,37 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class DatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "foodieapp.db", null, 6) { // Upgrade to version 6
+    SQLiteOpenHelper(context, "foodieapp.db", null, 8) { // Upgrade to version 7
 
     override fun onCreate(db: SQLiteDatabase) {
+        // 1. Tabel Toko
+        val createTableToko = """
+            CREATE TABLE toko (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nama_toko TEXT,
+                latitude REAL,
+                longitude REAL
+            )
+        """.trimIndent()
+
+        // Dummy Data Toko
+        db?.execSQL(createTableToko)
+        db.execSQL("""
+            INSERT INTO toko (nama_toko, latitude, longitude) 
+            VALUES ('Warung Pusat FoodieApp', -6.34625, 106.80415)
+        """)
+
+        // 2. Tabel Relasi (Many-to-Many: Satu menu bisa dijual di banyak toko)
+        val createTableTokoMenu = """
+            CREATE TABLE toko_menu (
+                toko_id INTEGER,
+                menu_id INTEGER,
+                FOREIGN KEY(toko_id) REFERENCES toko(id),
+                FOREIGN KEY(menu_id) REFERENCES menus(id)
+            )
+        """.trimIndent()
+        db?.execSQL(createTableTokoMenu)
+
         db.execSQL("""
             CREATE TABLE users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,12 +78,12 @@ class DatabaseHelper(context: Context) :
     private fun insertDefaultMenus(db: SQLiteDatabase) {
         data class MenuData(val name: String, val desc: String, val price: Int, val category: String, val img: String)
         val menus = listOf(
-            MenuData("Nasi Goreng Spesial", "Porsi besar dengan telur dan ayam pilihan", 25000, "Chicken" , "menu_nasgor"),
-            MenuData("Ayam Taliwang", "Ayam bakar khas Lombok dengan bumbu rempah pedas", 32000, "Chicken" , "menu_ayam_taliwang"),
-            MenuData("Mie Bakso", "Mie kuah hangat dengan bakso sapi kenyal dan pelengkap", 20000, "Beef" , "menu_mie_bakso"),
-            MenuData("Sate Maranggi", "Sate daging sapi khas Purwakarta dengan bumbu kecap manis", 28000, "Beef" , "menu_sate_maranggi"),
-            MenuData("Es Jeruk Segar", "Minuman jeruk peras segar dingin, cocok menemani makan", 8000, "Dessert",  "menu_es_jeruk"),
-            MenuData("Es Teh Manis", "Teh manis dingin klasik, menyegarkan dan selalu pas", 6000, "Dessert",  "menu_es_teh")
+            MenuData("Nasi Goreng Spesial", "Porsi besar dengan telur dan ayam pilihan", 25000, "Nasi" , "menu_nasgor"),
+            MenuData("Ayam Taliwang", "Ayam bakar khas Lombok dengan bumbu rempah pedas", 32000, "Ayam" , "menu_ayam_taliwang"),
+            MenuData("Mie Bakso", "Mie kuah hangat dengan bakso sapi kenyal dan pelengkap", 20000, "Sapi" , "menu_mie_bakso"),
+            MenuData("Sate Maranggi", "Sate daging sapi khas Purwakarta dengan bumbu kecap manis", 28000, "Sapi" , "menu_sate_maranggi"),
+            MenuData("Es Jeruk Segar", "Minuman jeruk peras segar dingin, cocok menemani makan", 8000, "Minuman",  "menu_es_jeruk"),
+            MenuData("Es Teh Manis", "Teh manis dingin klasik, menyegarkan dan selalu pas", 6000, "Minuman",  "menu_es_teh")
         )
         menus.forEach { menu ->
             val cv = ContentValues().apply {
@@ -67,6 +95,10 @@ class DatabaseHelper(context: Context) :
             }
             db.insert("menus", null, cv)
         }
+    }
+
+    private fun insertDeafultShop(db: SQLiteDatabase) {
+
     }
 
     // ── USER METHODS ──────────────────────────────────────

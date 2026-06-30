@@ -2,20 +2,69 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/bg_color">
+    android:background="@color/bg_color"
+    android:padding="16dp">
 
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="Cari menu makanan..."
-        android:padding="8dp"/>
+        android:iconifiedByDefault="false"
+        android:queryHint="Cari menu..."
+        android:layout_marginBottom="12dp"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.button.MaterialButtonGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Semua"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterChicken"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Ayam"
+            />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterBeef"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Sapi"
+            />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterMinuman"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Minuman"
+            />
+
+        </com.google.android.material.button.MaterialButtonGroup>
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMenu"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

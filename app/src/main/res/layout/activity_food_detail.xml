@@ -85,6 +85,31 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📍"
+                android:textSize="16sp"
+                android:textColor="@color/brand_secondary"/>
+
+            <TextView
+                android:id="@+id/tvJarak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 m"
+                android:textSize="14sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginStart="4dp"/>
+
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/btnPesan"
