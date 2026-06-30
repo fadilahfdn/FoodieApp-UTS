@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -51,6 +52,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         askLocationPermission()
+    }
+
+    private lateinit var networkReceiver: NetworkReceiver
+
+    override fun onStart() {
+        super.onStart()
+        networkReceiver = NetworkReceiver()
+        networkReceiver.onNetworkChange = { isConnected ->
+            runOnUiThread {
+                binding.tvNetworkBanner.visibility =
+                    if (!isConnected) View.VISIBLE else View.GONE
+            }
+        }
+        val filter = android.content.IntentFilter(
+            android.net.ConnectivityManager.CONNECTIVITY_ACTION
+        )
+        @Suppress("DEPRECATION")
+        registerReceiver(networkReceiver, filter)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(networkReceiver)
     }
 
     private fun loadFragment(fragment: Fragment) {
