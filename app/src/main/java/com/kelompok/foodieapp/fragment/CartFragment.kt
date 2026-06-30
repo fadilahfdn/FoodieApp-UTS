@@ -5,6 +5,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.kelompok.foodieapp.NotificationHelper
 import com.kelompok.foodieapp.adapter.CartAdapter
 import com.kelompok.foodieapp.database.DatabaseHelper
 import com.kelompok.foodieapp.databinding.FragmentCartBinding
@@ -52,18 +53,30 @@ class CartFragment : Fragment() {
         loadCart()
 
         binding.btnCheckout.setOnClickListener {
-            val email      = requireActivity()
+            val email = requireActivity()
                 .getSharedPreferences("session", 0)
                 .getString("user_email", "") ?: ""
 
-            val items      = db.getCartItems()
-            val totalItems = db.getCartItems().sumOf { it["quantity"] as Int }
+            val items = db.getCartItems()
+
+            if (items.isEmpty()) return@setOnClickListener
+
+            val totalItems = items.sumOf { it["quantity"] as Int }
 
             db.saveOrderHistory(items)
             db.addTotalOrdered(email, totalItems)
             db.clearCart()
-            Toast.makeText(requireContext(), "Pesanan berhasil dikonfirmasi!", Toast.LENGTH_LONG).show()
+
+            Toast.makeText(requireContext(), "Memproses pesanan Anda...", Toast.LENGTH_SHORT).show()
+
+            //Langsung kosongkan UI keranjang di layar
             loadCart()
+
+            // Picu Notifikasi dengan jeda 3 deti
+            val appContext = requireActivity().applicationContext
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                NotificationHelper.showCheckoutNotification(appContext)
+            }, 3000)
         }
     }
 
