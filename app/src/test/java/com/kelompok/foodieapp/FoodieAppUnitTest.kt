@@ -1,6 +1,5 @@
 package com.kelompok.foodieapp
 
-import com.kelompok.foodieapp.data.FoodCategory
 import com.kelompok.foodieapp.data.FoodItem
 import com.kelompok.foodieapp.data.FoodRepository
 import org.junit.Assert.assertEquals
