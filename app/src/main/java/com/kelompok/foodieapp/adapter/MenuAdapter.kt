@@ -3,7 +3,6 @@ package com.kelompok.foodieapp.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.kelompok.foodieapp.R
 import com.kelompok.foodieapp.data.MenuItem
 import com.kelompok.foodieapp.databinding.ItemMenuCardBinding
