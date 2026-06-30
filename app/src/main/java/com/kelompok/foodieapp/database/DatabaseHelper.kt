@@ -6,39 +6,19 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class DatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "foodieapp.db", null, 6) { // Upgrade to version 6
+    SQLiteOpenHelper(context, "foodieapp.db", null, 13) { // Upgrade to version 13
 
     override fun onCreate(db: SQLiteDatabase) {
-        // 1. Tabel Toko
-        val createTableToko = """
-            CREATE TABLE toko (
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS toko (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nama_toko TEXT,
                 latitude REAL,
                 longitude REAL
             )
-        """.trimIndent()
-
-        // Dummy Data Toko
-        db?.execSQL(createTableToko)
-        db.execSQL("""
-            INSERT INTO toko (nama_toko, latitude, longitude) 
-            VALUES ('Warung Pusat FoodieApp', -6.34625, 106.80415)
         """)
-
-        // 2. Tabel Relasi (Many-to-Many: Satu menu bisa dijual di banyak toko)
-        val createTableTokoMenu = """
-            CREATE TABLE toko_menu (
-                toko_id INTEGER,
-                menu_id INTEGER,
-                FOREIGN KEY(toko_id) REFERENCES toko(id),
-                FOREIGN KEY(menu_id) REFERENCES menus(id)
-            )
-        """.trimIndent()
-        db?.execSQL(createTableTokoMenu)
-
         db.execSQL("""
-            CREATE TABLE users (
+            CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 email TEXT NOT NULL UNIQUE,
@@ -47,18 +27,20 @@ class DatabaseHelper(context: Context) :
             )
         """)
         db.execSQL("""
-            CREATE TABLE menus (
+            CREATE TABLE IF NOT EXISTS menus (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 description TEXT,
                 price INTEGER NOT NULL,
                 category TEXT,
                 image_url TEXT,
-                rating REAL DEFAULT 4.5
+                rating REAL DEFAULT 4.5,
+                toko_id INTEGER,
+                FOREIGN KEY(toko_id) REFERENCES toko(id)
             )
         """)
         db.execSQL("""
-            CREATE TABLE cart (
+            CREATE TABLE IF NOT EXISTS cart (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 menu_id INTEGER NOT NULL,
                 menu_name TEXT NOT NULL,
@@ -68,7 +50,7 @@ class DatabaseHelper(context: Context) :
         """)
 
         db.execSQL("""
-            CREATE TABLE order_history (
+            CREATE TABLE IF NOT EXISTS order_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 menu_name TEXT NOT NULL,
                 quantity INTEGER NOT NULL,
@@ -76,10 +58,12 @@ class DatabaseHelper(context: Context) :
                 order_date TEXT NOT NULL
              )
         """)
+        insertDefaultShops(db)
         insertDefaultMenus(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS toko")
         db.execSQL("DROP TABLE IF EXISTS users")
         db.execSQL("DROP TABLE IF EXISTS menus")
         db.execSQL("DROP TABLE IF EXISTS cart")
@@ -87,15 +71,29 @@ class DatabaseHelper(context: Context) :
         onCreate(db)
     }
 
+    private fun insertDefaultShops(db: SQLiteDatabase) {
+        val tokoQueries = listOf(
+            // Titik 1: Persis di area UPN Veteran Jakarta Kampus Pondok Labu (Jl. RS Fatmawati)
+            "INSERT INTO toko (id, nama_toko, latitude, longitude) VALUES (1, 'Warung Pusat FoodieApp UPNVJ', -6.311494, 106.794611)",
+
+            // Titik 2: Persis di Jalan Margonda Raya (Area Margo City)
+            "INSERT INTO toko (id, nama_toko, latitude, longitude) VALUES (2, 'Kedai Nasi & Ayam Margonda', -6.372500, 106.833100)",
+
+            // Titik 3: Persis di jalan utama Cinere (Area Mall Cinere)
+            "INSERT INTO toko (id, nama_toko, latitude, longitude) VALUES (3, 'Spesialis Sapi Cinere', -6.321800, 106.782500)"
+        )
+        tokoQueries.forEach { db.execSQL(it) }
+    }
+
     private fun insertDefaultMenus(db: SQLiteDatabase) {
-        data class MenuData(val name: String, val desc: String, val price: Int, val category: String, val img: String)
+        data class MenuData(val name: String, val desc: String, val price: Int, val category: String, val img: String, val tokoId: Int)
         val menus = listOf(
-            MenuData("Nasi Goreng Spesial", "Porsi besar dengan telur dan ayam pilihan", 25000, "Nasi" , "menu_nasgor"),
-            MenuData("Ayam Taliwang", "Ayam bakar khas Lombok dengan bumbu rempah pedas", 32000, "Ayam" , "menu_ayam_taliwang"),
-            MenuData("Mie Bakso", "Mie kuah hangat dengan bakso sapi kenyal dan pelengkap", 20000, "Sapi" , "menu_mie_bakso"),
-            MenuData("Sate Maranggi", "Sate daging sapi khas Purwakarta dengan bumbu kecap manis", 28000, "Sapi" , "menu_sate_maranggi"),
-            MenuData("Es Jeruk Segar", "Minuman jeruk peras segar dingin, cocok menemani makan", 8000, "Minuman",  "menu_es_jeruk"),
-            MenuData("Es Teh Manis", "Teh manis dingin klasik, menyegarkan dan selalu pas", 6000, "Minuman",  "menu_es_teh")
+            MenuData("Nasi Goreng Spesial", "Porsi besar dengan telur dan ayam pilihan", 25000, "Nasi" , "menu_nasgor", 1),
+            MenuData("Ayam Taliwang", "Ayam bakar khas Lombok dengan bumbu rempah pedas", 32000, "Ayam" , "menu_ayam_taliwang", 2),
+            MenuData("Mie Bakso", "Mie kuah hangat dengan bakso sapi kenyal dan pelengkap", 20000, "Sapi" , "menu_mie_bakso", 3),
+            MenuData("Sate Maranggi", "Sate daging sapi khas Purwakarta dengan bumbu kecap manis", 28000, "Sapi" , "menu_sate_maranggi", 3),
+            MenuData("Es Jeruk Segar", "Minuman jeruk peras segar dingin, cocok menemani makan", 8000, "Minuman",  "menu_es_jeruk", 1),
+            MenuData("Es Teh Manis", "Teh manis dingin klasik, menyegarkan dan selalu pas", 6000, "Minuman",  "menu_es_teh", 2)
         )
         menus.forEach { menu ->
             val cv = ContentValues().apply {
@@ -104,6 +102,7 @@ class DatabaseHelper(context: Context) :
                 put("price", menu.price)
                 put("category", menu.category)
                 put("image_url", menu.img)
+                put("toko_id", menu.tokoId)
             }
             db.insert("menus", null, cv)
         }
@@ -196,9 +195,27 @@ class DatabaseHelper(context: Context) :
         return result
     }
 
-    fun updateMenuImageUrl(menuId: Int, imageUrl: String) {
-        val cv = ContentValues().apply { put("image_url", imageUrl) }
-        writableDatabase.update("menus", cv, "id=?", arrayOf(menuId.toString()))
+    fun getStoreByMenuId(menuId: Int): Map<String, Any>? {
+        val db = readableDatabase
+        // Query dengan LEFT JOIN ke tabel menus untuk One-to-Many
+        val cursor = db.rawQuery("""
+            SELECT t.nama_toko, t.latitude, t.longitude 
+            FROM toko t
+            LEFT JOIN menus m ON t.id = m.toko_id AND m.id = ?
+            ORDER BY (m.id = ?) DESC, t.id ASC
+            LIMIT 1
+        """, arrayOf(menuId.toString(), menuId.toString()))
+
+        return if (cursor.moveToFirst()) {
+            mapOf(
+                "nama_toko" to cursor.getString(0),
+                "latitude"  to cursor.getDouble(1),
+                "longitude" to cursor.getDouble(2)
+            ).also { cursor.close() }
+        } else {
+            cursor.close()
+            null
+        }
     }
 
     // ── CART METHODS ──────────────────────────────────────

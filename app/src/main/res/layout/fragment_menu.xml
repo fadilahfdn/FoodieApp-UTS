@@ -13,11 +13,14 @@
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
         android:queryHint="Cari menu..."
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp"
+        android:background="@color/white"
+        />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
         android:scrollbars="none"
         android:layout_marginBottom="12dp">
 

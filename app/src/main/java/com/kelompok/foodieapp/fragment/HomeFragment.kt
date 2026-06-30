@@ -28,6 +28,13 @@ class HomeFragment : Fragment() {
         // 1. Sapaan User
         val prefs = requireActivity().getSharedPreferences("session", 0)
         binding.tvGreeting.text = "Halo, ${prefs.getString("user_name", "Pengguna")}! 👋"
+        binding.btnPesanSekarang.setOnClickListener {
+            val bottomNav = activity?.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
+
+            // Picu perpindahan tab ke MenuFragment secara otomatis
+            // PASTIKAN R.id.navigation_menu di bawah ini sama dengan ID menu di file res/menu/bottom_nav_menu.xml kelompokmu!
+            bottomNav?.selectedItemId = R.id.nav_menu
+        }
 
         // 2. Setup RecyclerView (Grid 2 Kolom)
         gridAdapter = GridMenuAdapter(mutableListOf())
