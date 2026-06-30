@@ -34,8 +34,8 @@ class FoodDetailActivity : AppCompatActivity() {
 
         // Handle image based on type (String for API, Int for Local)
         val imageExtra = intent.extras?.get("MENU_IMAGE")
-        val menuImagePublic = if (imageExtra is String) imageExtra else null
-        val menuImage = if (imageExtra is Int) imageExtra else 0
+        val menuImagePublic = imageExtra as? String
+        val menuImage = imageExtra as? Int ?: 0
 
         binding.tvDetailName.text  = menuName
         binding.tvDetailCategory.text = menuCategory

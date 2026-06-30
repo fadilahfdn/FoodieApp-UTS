@@ -68,8 +68,12 @@ class MainActivity : AppCompatActivity() {
         val filter = android.content.IntentFilter(
             android.net.ConnectivityManager.CONNECTIVITY_ACTION
         )
-        @Suppress("DEPRECATION")
-        registerReceiver(networkReceiver, filter)
+        ContextCompat.registerReceiver(
+            this,
+            networkReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onStop() {
