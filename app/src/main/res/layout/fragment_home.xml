@@ -46,7 +46,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FF5722"
+                    android:background="@color/brand_primary"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:text="Lihat Semua"
                     android:textSize="14sp"
-                    android:textColor="#FF5722"
+                    android:textColor="@color/brand_primary"
                     android:textStyle="bold"/>
             </LinearLayout>
 
