@@ -3,6 +3,7 @@ package com.kelompok.foodieapp
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -26,12 +27,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                // Jika user menekan "Allow/Izinkan"
+            } else {
+                // Jika user menekan "Don't Allow/Tolak"
+                Toast.makeText(this, "Notifikasi dimatikan. Anda mungkin melewatkan info pesanan.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Cek sesi login
+        askNotificationPermission()
+
+        // Cek sesi loginz
         val prefs = getSharedPreferences("session", MODE_PRIVATE)
         if (!prefs.getBoolean("is_logged_in", false)) {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -92,6 +105,20 @@ class MainActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED) {
             // Jika belum ada izin, langsung tembak pop-up
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // Izin ini hanya diwajibkan oleh Google untuk Android 13 (Tiramisu / API 33) ke atas
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // Izin sudah pernah diberikan sebelumnya, tidak perlu memunculkan pop-up lagi
+            } else {
+                // Sistem belum diberi izin, munculkan Pop-up sekarang!
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     }
 }
