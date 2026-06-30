@@ -52,8 +52,17 @@ class CartFragment : Fragment() {
         loadCart()
 
         binding.btnCheckout.setOnClickListener {
+            val email      = requireActivity()
+                .getSharedPreferences("session", 0)
+                .getString("user_email", "") ?: ""
+
+            val items      = db.getCartItems()
+            val totalItems = db.getCartItems().sumOf { it["quantity"] as Int }
+
+            db.saveOrderHistory(items)
+            db.addTotalOrdered(email, totalItems)
             db.clearCart()
-            Toast.makeText(requireContext(), "Pesanan berhasil dikonfirmasi! 🎉", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Pesanan berhasil dikonfirmasi!", Toast.LENGTH_LONG).show()
             loadCart()
         }
     }
