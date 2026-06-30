@@ -29,7 +29,7 @@ object ApiService {
                 val randomPrices = listOf(20000, 25000, 30000, 35000, 40000, 45000, 50000)
                 val price = randomPrices.random()
 
-                val mockDescription = "Menu rekomendasi spesial hari ini asal ${meal.getString("strCountry")}. Disiapkan dengan bahan pilihan yang pastinya menggugah selera!"
+                val mockDescription = "Menu rekomendasi spesial hari ini dari dapur kami. Disiapkan dengan bahan pilihan yang pastinya menggugah selera!"
 
                 result.add(mapOf(
                     "id"        to meal.getString("idMeal"),
