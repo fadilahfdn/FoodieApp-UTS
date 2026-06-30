@@ -67,6 +67,11 @@ class MenuFragment : Fragment() {
             updateActiveButtonUI(binding.btnFilterAll)
         }
 
+        binding.btnFilterNasi.setOnClickListener {
+            loadMenus(FoodCategory.NASI)
+            updateActiveButtonUI(binding.btnFilterNasi)
+        }
+
         binding.btnFilterChicken.setOnClickListener {
             loadMenus(FoodCategory.AYAM)
             updateActiveButtonUI(binding.btnFilterChicken)

@@ -26,11 +26,7 @@ class MenuAdapter(
     override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         val item = items[position]
         with(holder.binding) {
-            Glide.with(root.context)
-                .load(item.imageRes)
-                .placeholder(R.drawable.loading_images)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgMenu)
+            imgMenu.setImageResource(item.imageRes)
             tvMenuName.text   = item.name
             tvMenuDesc.text   = item.description
             tvMenuPrice.text  = "Rp ${String.format("%,d", item.price).replace(',', '.')}"
