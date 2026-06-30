@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.kelompok.foodieapp.data.ApiService
@@ -41,18 +40,11 @@ class FoodDetailActivity : AppCompatActivity() {
         binding.tvDetailCategory.text = menuCategory
         binding.tvDetailDesc.text  = menuDesc
         binding.tvDetailPrice.text = "Rp ${String.format("%,d", menuPrice).replace(',', '.')}"
-        if (!menuImagePublic.isNullOrEmpty()) {
-            // Jika dari API, pakai Glide
-            Glide.with(this)
-                .load(menuImagePublic)
-                .placeholder(R.drawable.loading_images)
-                .error(R.drawable.ic_launcher_background)
-                .into(binding.imgDetail)
-        } else if (menuImage != 0) {
+        if (menuImage != 0) {
             // Jika dari SQLite, pakai resource lokal
             binding.imgDetail.setImageResource(menuImage)
         } else {
-            // Fallback kalau dua-duanya kosong
+            // Fallback kalau kosong
             binding.imgDetail.setImageResource(R.drawable.ic_launcher_background)
         }
 

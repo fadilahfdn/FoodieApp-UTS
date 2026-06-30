@@ -39,6 +39,14 @@
                 android:text="Semua"/>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFilterNasi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Nasi"
+            />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnFilterChicken"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
