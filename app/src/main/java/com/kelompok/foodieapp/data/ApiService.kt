@@ -1,49 +1,49 @@
 package com.kelompok.foodieapp.data
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.json.JSONObject
-import kotlin.math.min // Pastikan ini ter-import jika minOf error
+
 
 object ApiService {
 
-    private val client = OkHttpClient()
-    private const val BASE_URL = "https://www.themealdb.com/api/json/v1/1/"
+    private const val BASE_URL = "https://router.project-osrm.org/route/v1"
 
-    fun getMenusByCategory(category: String? = null): List<Map<String, String>> {
-        val result = mutableListOf<Map<String, String>>()
+    fun getRouteDistance(userLat: Double, userLng: Double, tokoLat: Double, tokoLng: Double): Double? {
+        val client = okhttp3.OkHttpClient()
+        val url = "https://router.project-osrm.org/route/v1/driving/$userLng,$userLat;$tokoLng,$tokoLat?overview=false"
+
+        // 1. Intip URL yang ditembak
+        android.util.Log.d("OSRM_DEBUG", "Menembak URL: $url")
+
         return try {
-            val categories = listOf("Chicken", "Beef", "Seafood", "Dessert", "Pasta", "Vegetarian")
-            val selectedCategory = category ?: categories.random()
-
-            val url      = "${BASE_URL}filter.php?c=$selectedCategory"
-            val request  = Request.Builder().url(url).build()
+            val request = okhttp3.Request.Builder()
+                .url(url)
+                .addHeader("User-Agent", "FoodieApp/1.0")
+                .build()
             val response = client.newCall(request).execute()
-            val body     = response.body?.string() ?: return result
-            val json     = JSONObject(body)
-            val meals    = json.optJSONArray("meals") ?: return result
+            val body = response.body?.string() ?: return null
 
-            for (i in 0 until minOf(meals.length(), 16)) {
-                val meal = meals.getJSONObject(i)
+            // 2. Intip respons mentah dari server OSRM
+            android.util.Log.d("OSRM_DEBUG", "Respons Mentah Server: $body")
 
-                val randomPrices = listOf(20000, 25000, 30000, 35000, 40000, 45000, 50000)
-                val price = randomPrices.random()
+            val json = org.json.JSONObject(body)
+            val code = json.optString("code")
 
-                val mockDescription = "Menu rekomendasi spesial hari ini asal ${meal.getString("strCountry")}. Disiapkan dengan bahan pilihan yang pastinya menggugah selera!"
-
-                result.add(mapOf(
-                    "id"        to meal.getString("idMeal"),
-                    "name"      to meal.getString("strMeal"),
-                    "image_url" to meal.getString("strMealThumb"),
-                    "description" to mockDescription,
-                    "price" to price.toString(),
-                    "category" to selectedCategory
-                ))
+            if (code != "Ok") {
+                android.util.Log.e("OSRM_DEBUG", "OSRM Menolak Rute! Kode Error: $code")
+                return null
             }
-            result
+
+            val routes = json.optJSONArray("routes")
+            if (routes != null && routes.length() > 0) {
+                val route = routes.getJSONObject(0)
+                route.getDouble("distance")
+            } else {
+                null
+            }
         } catch (e: Exception) {
+            // 3. Intip kalau ada crash internet atau parsing JSON
+            android.util.Log.e("OSRM_DEBUG", "Terjadi Crash/Error: ${e.message}")
             e.printStackTrace()
-            result
+            null
         }
     }
 }

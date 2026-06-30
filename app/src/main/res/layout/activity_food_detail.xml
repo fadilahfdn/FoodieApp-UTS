@@ -85,6 +85,56 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🏪"
+                android:textSize="16sp"
+                android:textColor="@color/brand_secondary"/>
+
+            <TextView
+                android:id="@+id/tvStoreName"
+                android:layout_width="wrap_content"
+                android:layout_height="22dp"
+                android:layout_marginStart="4dp"
+                android:text="Nama Toko"
+                android:textColor="@color/text_muted"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📍"
+                android:textSize="16sp"
+                android:textColor="@color/brand_secondary"/>
+
+            <TextView
+                android:id="@+id/tvDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 km"
+                android:textSize="14sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginStart="4dp"/>
+
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/btnPesan"

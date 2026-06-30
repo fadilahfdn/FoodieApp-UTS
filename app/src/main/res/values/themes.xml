@@ -1,7 +1,17 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Theme.FoodieApp" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/brand_primary</item>
         <item name="colorSecondary">@color/brand_secondary</item>
         <item name="android:statusBarColor">@color/brand_primary</item>
+        <item name="fontFamily">@font/montserrat</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="materialButtonStyle">@style/Widget.FoodieApp.Button</item>
+        <item name="android:buttonStyle">@style/Widget.FoodieApp.Button</item>
+    </style>
+
+    <style name="Widget.FoodieApp.Button" parent="Widget.Material3.Button">
+        <item name="android:fontFamily">@font/montserrat_bold</item>
+        <item name="fontFamily">@font/montserrat_bold</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

@@ -8,9 +8,10 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.kelompok.foodieapp.R
 import com.kelompok.foodieapp.FoodDetailActivity
+import com.kelompok.foodieapp.R
 import com.kelompok.foodieapp.adapter.MenuAdapter
+import com.kelompok.foodieapp.data.FoodCategory
 import com.kelompok.foodieapp.data.MenuItem
 import com.kelompok.foodieapp.database.DatabaseHelper
 import com.kelompok.foodieapp.databinding.FragmentMenuBinding
@@ -48,7 +49,7 @@ class MenuFragment : Fragment() {
         binding.rvMenu.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMenu.adapter = adapter
 
-        loadMenus()
+        loadMenus(null)
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?) = false
@@ -60,11 +61,40 @@ class MenuFragment : Fragment() {
                 return true
             }
         })
+
+        binding.btnFilterAll.setOnClickListener {
+            loadMenus(null)
+            updateActiveButtonUI(binding.btnFilterAll)
+        }
+
+        binding.btnFilterChicken.setOnClickListener {
+            loadMenus(FoodCategory.AYAM)
+            updateActiveButtonUI(binding.btnFilterChicken)
+        }
+
+        binding.btnFilterBeef.setOnClickListener {
+            loadMenus(FoodCategory.SAPI)
+            updateActiveButtonUI(binding.btnFilterBeef)
+        }
+
+        binding.btnFilterMinuman.setOnClickListener {
+            loadMenus(FoodCategory.MINUMAN)
+            updateActiveButtonUI(binding.btnFilterMinuman)
+        }
+
+        updateActiveButtonUI(binding.btnFilterAll)
     }
 
-    private fun loadMenus() {
-        val rawMenus = db.getAllMenus()
+    private fun loadMenus(category: String?) {
+        // Asumsi A1 sudah punya fungsi getMenusByCategory() atau getAllMenus() di SQLite
+        val rawMenus = if (category == null) {
+            db.getAllMenus()
+        } else {
+            db.getMenusByCategory(category)
+        }
+
         allMenus = rawMenus.map {
+            // Logika pemetaan data SQLite ke list MenuItem (sama seperti sebelumnya)
             val imageResName = it["image_url"] as? String ?: ""
             val resId = if (imageResName.isNotEmpty()) {
                 requireContext().resources.getIdentifier(imageResName, "drawable", requireContext().packageName)
@@ -75,12 +105,36 @@ class MenuFragment : Fragment() {
                 name        = it["name"] as String,
                 description = it["description"] as String,
                 price       = it["price"] as Int,
-                category    = it["category"] as String,
-                imageRes    = if (resId != 0) resId else R.drawable.ic_launcher_background,
-                rating      = it["rating"] as Double
+                category    = it["category"] as? String ?: "Umum",
+                imageRes    = if (resId != 0) resId else R.drawable.ic_launcher_background
             )
         }
         adapter.updateData(allMenus)
+    }
+
+    private fun updateActiveButtonUI(activeButton: com.google.android.material.button.MaterialButton) {
+        // 1. Kumpulkan semua tombol ke dalam satu list
+        val allButtons = listOf(
+            binding.btnFilterAll,
+            binding.btnFilterChicken,
+            binding.btnFilterBeef,
+            binding.btnFilterMinuman
+        )
+
+        // 2. Cek satu per satu
+        allButtons.forEach { btn ->
+            if (btn == activeButton) {
+                btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_primary)
+                )
+                btn.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white))
+            } else {
+                btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    androidx.core.content.ContextCompat.getColor(requireContext(), android.R.color.transparent)
+                )
+                btn.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_primary))
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -83,11 +83,4 @@ class GridMenuAdapter(
         notifyDataSetChanged()
     }
 
-    // Fungsi untuk menambah data di bawah (Infinite Scroll)
-    fun appendData(newItems: List<Map<String, String>>) {
-        val startPosition = items.size
-        items.addAll(newItems)
-        // Animasi halus saat data bertambah di bawah
-        notifyItemRangeInserted(startPosition, newItems.size)
-    }
 }
