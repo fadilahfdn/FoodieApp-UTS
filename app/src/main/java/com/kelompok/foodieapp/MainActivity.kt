@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity() {
                 // Jika user menekan "Don't Allow/Tolak"
                 Toast.makeText(this, "Notifikasi dimatikan. Anda mungkin melewatkan info pesanan.", Toast.LENGTH_SHORT).show()
             }
+
+            askLocationPermission()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,8 +65,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-        askLocationPermission()
     }
 
     private lateinit var networkReceiver: NetworkReceiver
@@ -109,16 +109,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askNotificationPermission() {
-        // Izin ini hanya diwajibkan oleh Google untuk Android 13 (Tiramisu / API 33) ke atas
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_GRANTED
             ) {
-                // Izin sudah pernah diberikan sebelumnya, tidak perlu memunculkan pop-up lagi
+                askLocationPermission()
             } else {
-                // Sistem belum diberi izin, munculkan Pop-up sekarang!
                 requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
+        } else {
+            askLocationPermission()
         }
     }
 }
