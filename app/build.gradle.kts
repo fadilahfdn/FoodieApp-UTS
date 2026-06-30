@@ -47,7 +47,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation("com.squareup.okhttp3:okhttp:4.12.0") // untuk membuat request
     implementation("com.google.code.gson:gson:2.10.1") // untuk mengambil data json
-    implementation("com.github.bumptech.glide:glide:4.16.0") // untuk memuat gambar
+//    implementation("com.github.bumptech.glide:glide:4.16.0") // untuk memuat gambar - tidak digunakan lagi, sekarang pakai yang lokal
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0") // untuk refresh jika scroll ke atas
     implementation("com.google.android.gms:play-services-location:21.0.1") // untuk permintaan akses lokasi
     testImplementation(libs.junit)

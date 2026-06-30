@@ -121,6 +121,7 @@ class MenuFragment : Fragment() {
         // 1. Kumpulkan semua tombol ke dalam satu list
         val allButtons = listOf(
             binding.btnFilterAll,
+            binding.btnFilterNasi,
             binding.btnFilterChicken,
             binding.btnFilterBeef,
             binding.btnFilterMinuman

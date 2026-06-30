@@ -4,7 +4,6 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.kelompok.foodieapp.FoodDetailActivity
 import com.kelompok.foodieapp.R
 import com.kelompok.foodieapp.databinding.ItemMenuGridBinding
@@ -29,23 +28,12 @@ class GridMenuAdapter(
         holder.binding.tvGridMenuName.text = item["name"] ?: ""
 
         val imageUrl = item["image_url"] ?: ""
-        
-        if (imageUrl.startsWith("http")) {
-            Glide.with(holder.itemView.context)
-                .load(imageUrl)
-                .placeholder(R.drawable.loading_images)
-                .error(R.drawable.ic_launcher_background)
-                .centerCrop()
-                .into(holder.binding.imgGridMenu)
-        } else {
-            // Local resource from SQLite
-            val resId = holder.itemView.context.resources.getIdentifier(
-                imageUrl, "drawable", holder.itemView.context.packageName
-            )
-            holder.binding.imgGridMenu.setImageResource(
-                if (resId != 0) resId else R.drawable.ic_launcher_background
-            )
-        }
+        val resId = holder.itemView.context.resources.getIdentifier(
+            imageUrl, "drawable", holder.itemView.context.packageName
+        )
+        holder.binding.imgGridMenu.setImageResource(
+            if (resId != 0) resId else R.drawable.ic_launcher_background
+        )
 
         holder.itemView.setOnClickListener {
             val apiIdString = item["id"] ?: "0"
@@ -56,16 +44,11 @@ class GridMenuAdapter(
             intent.putExtra("MENU_ID", menuId)
             intent.putExtra("MENU_NAME", item["name"])
             
-            // Check if it's a local image name or a URL
             val imageValue = item["image_url"] ?: ""
-            if (imageValue.startsWith("http")) {
-                intent.putExtra("MENU_IMAGE", imageValue)
-            } else {
-                val resId = holder.itemView.context.resources.getIdentifier(
-                    imageValue, "drawable", holder.itemView.context.packageName
-                )
-                intent.putExtra("MENU_IMAGE", resId)
-            }
+            val imgResId = holder.itemView.context.resources.getIdentifier(
+                imageValue, "drawable", holder.itemView.context.packageName
+            )
+            intent.putExtra("MENU_IMAGE", imgResId)
 
             intent.putExtra("MENU_PRICE", menuPrice)
             intent.putExtra("MENU_DESC", item["description"])
