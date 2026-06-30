@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class DatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "foodieapp.db", null, 6) { // Upgrade to version 6
+    SQLiteOpenHelper(context, "foodieapp.db", null, 7) { // Upgrade to version 6
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""
@@ -14,7 +14,8 @@ class DatabaseHelper(context: Context) :
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 email TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                total_ordered INTEGER DEFAULT 0
             )
         """)
         db.execSQL("""
@@ -37,6 +38,16 @@ class DatabaseHelper(context: Context) :
                 quantity INTEGER DEFAULT 1
             )
         """)
+
+        db.execSQL("""
+            CREATE TABLE order_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                menu_name TEXT NOT NULL,
+                quantity INTEGER NOT NULL,
+                total_price INTEGER NOT NULL,
+                order_date TEXT NOT NULL
+             )
+        """)
         insertDefaultMenus(db)
     }
 
@@ -44,6 +55,7 @@ class DatabaseHelper(context: Context) :
         db.execSQL("DROP TABLE IF EXISTS users")
         db.execSQL("DROP TABLE IF EXISTS menus")
         db.execSQL("DROP TABLE IF EXISTS cart")
+        db.execSQL("DROP TABLE IF EXISTS order_history")
         onCreate(db)
     }
 
@@ -219,5 +231,76 @@ class DatabaseHelper(context: Context) :
         val total = if (cursor.moveToFirst()) cursor.getInt(0) else 0
         cursor.close()
         return total
+    }
+
+    // menghitung total item yang pernah dipesan
+    fun getTotalItemsOrdered(email: String): Int {
+        val cursor = readableDatabase.rawQuery(
+            "SELECT total_ordered FROM users WHERE email=?", arrayOf(email)
+        )
+        val total = if (cursor.moveToFirst()) cursor.getInt(0) else 0
+        cursor.close()
+        return total
+    }
+
+    // menambah total pesanan
+    fun addTotalOrdered(email: String, amount: Int): Boolean {
+        return try {
+            val cursor = readableDatabase.rawQuery(
+                "SELECT total_ordered FROM users WHERE email=?", arrayOf(email)
+            )
+            if (cursor.moveToFirst()) {
+                val current = cursor.getInt(0)
+                cursor.close()
+                val cv = ContentValues().apply { put("total_ordered", current + amount) }
+                writableDatabase.update("users", cv, "email=?", arrayOf(email))
+            } else {
+                cursor.close()
+            }
+            true
+        } catch (e: Exception) { false }
+    }
+
+    fun saveOrderHistory(items: List<Map<String, Any>>) {
+        val date = java.text.SimpleDateFormat(
+            "dd MMM yyyy, HH:mm", java.util.Locale("id", "ID")
+        ).format(java.util.Date())
+
+        items.forEach { item ->
+            val cv = ContentValues().apply {
+                put("menu_name",   item["menu_name"] as String)
+                put("quantity",    item["quantity"] as Int)
+                put("total_price", (item["menu_price"] as Int) * (item["quantity"] as Int))
+                put("order_date",  date)
+            }
+            writableDatabase.insert("order_history", null, cv)
+        }
+    }
+
+    fun getOrderHistory(): List<Map<String, Any>> {
+        val result = mutableListOf<Map<String, Any>>()
+        val cursor = readableDatabase.rawQuery(
+            "SELECT * FROM order_history ORDER BY id DESC", null
+        )
+        while (cursor.moveToNext()) {
+            result.add(mapOf(
+                "id"          to cursor.getInt(0),
+                "menu_name"   to cursor.getString(1),
+                "quantity"    to cursor.getInt(2),
+                "total_price" to cursor.getInt(3),
+                "order_date"  to cursor.getString(4)
+            ))
+        }
+        cursor.close()
+        return result
+    }
+
+    // update profile
+    fun updateUser(email: String, newName: String): Boolean {
+        return try {
+            val cv = ContentValues().apply { put("name", newName) }
+            writableDatabase.update("users", cv, "email=?", arrayOf(email))
+            true
+        } catch (e: Exception) { false }
     }
 }
